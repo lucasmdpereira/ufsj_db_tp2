@@ -1,0 +1,1 @@
+cities = ["São João del Rei"]
