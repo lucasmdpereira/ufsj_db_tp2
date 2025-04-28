@@ -4,14 +4,19 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait #Olhar depois como funciona para ver se dá pra substituir o while
 from selenium.common.exceptions import ElementClickInterceptedException
-# from google_places_categories import google_places_categories
-# from cities import cities
-from services import sanitize_search_string
+from google_places_categories import google_places_categories
+from cities import cities
+from services import prepares_string_for_search
 import json
 
 def main() -> None: 
+    def openTab(driver: webdriver.Chrome, tab_name: str) -> None:
+        print(f"Abrindo aba: {tab_name}...")
+        tab = driver.find_element(By.XPATH, f'//button[.//div[contains(@class, "NlVald") and normalize-space()="{tab_name}"]]')
+        tab.click()
+        time.sleep(5)
+    
     def getTags(driver: webdriver.Chrome) -> list[str]:
         # iNvpkb
         print("Pegando Tags...")
@@ -130,22 +135,12 @@ def main() -> None:
         ActionChains(driver).send_keys(Keys.HOME).perform()
         print("Todas as entidades foram carregados.")
             
-    cities = ["São João del Rei"]
-    google_places_categories = {
-        # "alimentacao": [
-        #     "cafe", "supermarket"
-        # ],
-        "comercio": [
-            "book_store"
-        ],
-    }
-    
     inicio = time.time()
     print ("Iniciando o crawler às: ", time.strftime("%H:%M:%S", time.localtime(inicio)))
     
     for city in cities:
         print(f"Buscando em: {city}...")
-        city = sanitize_search_string(city)
+        city = prepares_string_for_search(city)
         
         for (_, subcategories) in google_places_categories.items():
             for subcategory in subcategories:
@@ -198,9 +193,7 @@ def main() -> None:
                         
                     # Abrir aba "Sobre"
                     try:
-                        sobre_tab = driver.find_element(By.XPATH, '//button[.//div[contains(@class, "NlVald") and normalize-space()="Sobre"]]')
-                        sobre_tab.click()
-                        time.sleep(5)  # Espera o carregamento da página
+                        openTab(driver, "Sobre")
                     
                         service["tags"] = getTags(driver)
                     except Exception as e:
@@ -209,10 +202,7 @@ def main() -> None:
                     
                     # Abrir aba "Avaliações"
                     try:
-                        comentarios_tab = driver.find_element(By.XPATH, '//button[.//div[contains(@class, "NlVald") and normalize-space()="Avaliações"]]')
-                        comentarios_tab.click()
-                        time.sleep(5)  # Espera o carregamento da página
-                        
+                        openTab(driver, "Avaliações")                        
                         service["comentarios_e_respostas"] = getComentarios(driver)
                     except Exception as e:
                         print(f"Erro ao pegar comentários e respostas: {e}")
