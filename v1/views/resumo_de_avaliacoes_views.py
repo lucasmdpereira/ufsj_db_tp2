@@ -17,7 +17,6 @@ class ResumoDeAvaliacoesViewSet(viewsets.ViewSet):
         validated_data = serializer.validated_data
         
         try:
-            breakpoint()
             with connection.cursor() as cursor:
                 cursor.execute("""
                     INSERT INTO resumos_de_avaliacoes (
