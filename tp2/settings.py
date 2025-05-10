@@ -100,11 +100,12 @@ DATABASES = {
     'default': {
         'NAME': 'ufsjtp2',
         'ENGINE': 'mysql.connector.django',
+        # 'ENGINE': 'django.db.backends.mysql',  # Changed to standard MySQL backend
         'USER': 'root',
         'PASSWORD': 'password',
         'HOST': 'localhost',
         'PORT': '3306',
-        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
+        'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}, # Comentar se deu problema
     },
 }
 
