@@ -22,3 +22,10 @@ Para pegar todas os elementos e comentários descomentar todas as linhas em que 
 ```bash
 uv run uv run crawler.py
 ```
+
+```bash
+git clone https://github.com/lucasmdpereira/ufsj_db_tp2.git
+cd ufsj_db_tp2/
+
+uv sync
+```

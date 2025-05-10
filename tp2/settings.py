@@ -42,7 +42,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret-key')
+SECRET_KEY = 'django-insecure-vzygt#l&-7k*63#ir6o-!p@a&%&a2n53q&@nih^!khp6&d)0i$'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -98,12 +98,12 @@ WSGI_APPLICATION = 'tp2.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': os.environ.get('DB_NAME'),
+        'NAME': 'ufsjtp2',
         'ENGINE': 'mysql.connector.django',
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+        'USER': 'root',
+        'PASSWORD': 'password',
+        'HOST': 'localhost',
+        'PORT': '3306',
         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"},
     },
 }

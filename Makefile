@@ -1,11 +1,6 @@
 setup:
 	@echo "Instalando dependências..."
-	@uv run pip install -r requirements.txt
-
-dependencies:
-	@make setup
-	@uv run pip install -U pip
-	@uv run pip install -e .
+	@uv sync
 
 lint:
 	@echo "Checking code style ..."
