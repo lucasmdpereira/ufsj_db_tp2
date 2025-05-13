@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
                 endereco VARCHAR(255) NOT NULL,
                 telefone VARCHAR(255) NOT NULL,
                 patrocinado BOOLEAN NOT NULL DEFAULT FALSE,
-                website VARCHAR(255) NOT NULL
+                website VARCHAR(255)
             );
             """,
             reverse_sql="""

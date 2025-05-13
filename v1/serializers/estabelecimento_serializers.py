@@ -7,4 +7,4 @@ class EstabelecimentoSerializer(serializers.Serializer):
     endereco = serializers.CharField(max_length=255)
     telefone = serializers.CharField(max_length=255)
     patrocinado = serializers.BooleanField(required=False, default=False)
-    website = serializers.CharField(required=False, allow_blank=True, max_length=255)
+    website = serializers.CharField(required=False, allow_blank=True, allow_null=True, max_length=255)
