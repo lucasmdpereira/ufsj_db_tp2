@@ -98,13 +98,12 @@ WSGI_APPLICATION = 'tp2.wsgi.application'
 
 DATABASES = {
     'default': {
-        'NAME': 'ufsjtp2',
+        'NAME': os.environ.get('DB_NAME'),
         'ENGINE': 'mysql.connector.django',
-        # 'ENGINE': 'django.db.backends.mysql',  # Changed to standard MySQL backend
-        'USER': 'root',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
         'OPTIONS': {'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"}, # Comentar se deu problema
     },
 }
