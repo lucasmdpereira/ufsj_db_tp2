@@ -12,3 +12,28 @@ dependencies = [
     "ruff>=0.11.7",
     "selenium>=4.31.0",
 ]
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+target-version = "py310"
+respect-gitignore = true
+show-fixes = true
+
+[tool.ruff.lint]
+select = ["RUF", "I", "PL", "F", "COM", "UP", "DJ", "T10", "T20", "DTZ", "SIM", "TID", "PTH", "ERA", "TRY"]
+ignore = ["PTH123", "T201", "DJ008", "TRY003", "TRY300", "TRY400", "RUF012", "COM812", "DJ001", "ERA001", "DTZ005" , "DTZ007", "PLR0915", "RUF005", "RUF015", "DTZ002", "TRY002", "PLR0913"]
+fixable = ["ALL"]
+
+[tool.ruff.format]
+indent-style = "space"
+line-ending = "auto"
+docstring-code-format = true
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"settings.py" = ["F403", "F404", "F405"]
+"apps.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["tp2", "v1", "utils"]

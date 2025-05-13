@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Estabelecimento(models.Model):
     link_google = models.CharField(max_length=255, primary_key=True)
     categoria = models.CharField(max_length=255)

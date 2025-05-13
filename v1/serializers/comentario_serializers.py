@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class ComentarioSerializer(serializers.Serializer):
     data_review_id = serializers.CharField(max_length=255)
     link_google = serializers.CharField(max_length=255)

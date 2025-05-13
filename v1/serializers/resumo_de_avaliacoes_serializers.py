@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class ResumoDeAvaliacoesSerializer(serializers.Serializer):
     link_google = serializers.CharField(max_length=255)
     qtd_avaliacoes = serializers.IntegerField()

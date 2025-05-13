@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -19,9 +20,4 @@ class Migration(migrations.Migration):
             DROP TABLE tags;
             """
         ),
-        
-        migrations.RunSQL(
-            sql="CREATE INDEX idx_tags_tag ON tags (tag);",
-            reverse_sql="DROP INDEX idx_tags_tag ON tags;"
-        )
     ]

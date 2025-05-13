@@ -1,5 +1,7 @@
 from django.db import models
+
 from v1.models.comentario import Comentario
+
 
 class Resposta(models.Model):
     data_review_id = models.ForeignKey(

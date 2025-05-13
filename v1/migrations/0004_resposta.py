@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -24,14 +25,5 @@ class Migration(migrations.Migration):
             reverse_sql="""
             DROP TABLE respostas;
             """
-        ),
-
-        migrations.RunSQL(
-            sql=[
-                "CREATE INDEX idx_respostas_data ON respostas (data);",
-            ],
-            reverse_sql=[
-                "DROP INDEX idx_respostas_data ON respostas;",
-            ]
         ),
     ]

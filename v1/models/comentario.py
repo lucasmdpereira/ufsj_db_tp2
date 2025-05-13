@@ -1,5 +1,7 @@
 from django.db import models
+
 from v1.models.estabelecimento import Estabelecimento
+
 
 class Comentario(models.Model):
     data_review_id = models.CharField(max_length=255, primary_key=True)

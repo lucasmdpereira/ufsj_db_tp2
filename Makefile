@@ -4,15 +4,19 @@ setup:
 
 lint:
 	@echo "Checking code style ..."
-	@uv run python -m ruff check . --exclude=utils
+	@uv run python -m ruff check . 
 
 style:
 	@echo "Applying code style ..."
-	@uv run python -m ruff . --fix --exclude=utils
+	@uv run python -m ruff check . --fix 
 
 run:
 	@echo "Iniciando o servidor de desenvolvimento..."
 	@uv run python manage.py runserver
+
+crawler:
+	@echo "Iniciando o crawler..."
+	@uv run python -m v1.tasks.crawler
 
 showmigrations:
 	@echo "Listando migrações aplicadas e pendentes..."

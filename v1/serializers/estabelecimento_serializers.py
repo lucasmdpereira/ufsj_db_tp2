@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class EstabelecimentoSerializer(serializers.Serializer):
     link_google = serializers.CharField(max_length=255)
     categoria = serializers.CharField(max_length=255)

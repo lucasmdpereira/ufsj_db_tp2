@@ -1,5 +1,6 @@
 from django.db import migrations
 
+
 class Migration(migrations.Migration):
 
     initial = True
@@ -26,20 +27,7 @@ class Migration(migrations.Migration):
             DROP TABLE comentarios;
             """
         ),
-
-        migrations.RunSQL(
-            sql=[
-                "CREATE INDEX idx_comentarios_data ON comentarios (data);",
-                "CREATE INDEX idx_comentarios_estrelas ON comentarios (qtd_estrelas);",
-                "CREATE INDEX idx_comentarios_curtidas ON comentarios (qtd_curtidas);"
-            ],
-            reverse_sql=[
-                "DROP INDEX idx_comentarios_data ON comentarios;",
-                "DROP INDEX idx_comentarios_estrelas ON comentarios;",
-                "DROP INDEX idx_comentarios_curtidas ON comentarios;"
-            ]
-        ),
-
+        
         migrations.RunSQL(
             sql="""
             ALTER TABLE comentarios

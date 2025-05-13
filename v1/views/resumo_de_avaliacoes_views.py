@@ -1,8 +1,9 @@
 from django.db import connection
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.response import Response
-from collections import OrderedDict
+
 from v1.serializers.resumo_de_avaliacoes_serializers import ResumoDeAvaliacoesSerializer
+
 
 class ResumoDeAvaliacoesViewSet(viewsets.ViewSet):
     

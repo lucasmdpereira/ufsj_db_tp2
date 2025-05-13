@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class EstabelecimentoTag(models.Model):
     link_google = models.ForeignKey(
         'Estabelecimento',

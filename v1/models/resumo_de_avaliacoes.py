@@ -1,5 +1,7 @@
 from django.db import models
+
 from v1.models.estabelecimento import Estabelecimento
+
 
 class ResumoDeAvaliacoes(models.Model):
     link_google = models.ForeignKey(
