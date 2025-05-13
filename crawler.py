@@ -9,8 +9,126 @@ from google_places_categories import google_places_categories
 from cities import cities
 from services import prepares_string_for_search
 import json
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+import os
+import django
 
-def main() -> None: 
+def extract_id_gmaps(url):
+    padrao = r'!16s%2Fg%2F([a-zA-Z0-9_-]+)'
+    match = re.search(padrao, url)
+    return match.group(1) if match else None
+
+class FakeRequest:
+    def __init__(self, data):
+        self.data = data
+
+class Estabelecimento:
+    def __init__(self, link_google, categoria, nome, endereco, telefone, website):
+        self.link_google = extract_id_gmaps(link_google)
+        self.categoria = categoria
+        self.nome = nome
+        self.endereco = endereco
+        self.telefone = telefone
+        self.website = website
+    
+    def printJson(self):
+        data = {
+            "link_google": self.link_google,
+            "categoria": self.categoria,
+            "nome": self.nome,
+            "endereco": self.endereco,
+            "telefone": self.telefone,
+            "website": self.website
+        }
+
+        print(json.dumps(data, ensure_ascii=False, indent=4))
+        return data
+
+class Comentario:
+    def __init__(self, data_review_id, qtd_estrelas, qtd_curtidas, data, texto, usuario_qtd_avaliacoes, usuario_qtd_fotos, usuario_is_local_guide, link_google):
+        self.data_review_id = data_review_id
+        self.qtd_estrelas = int(qtd_estrelas)
+        self.qtd_curtidas = qtd_curtidas
+        self.data = data
+        self.texto = texto
+        self.usuario_qtd_avaliacoes = usuario_qtd_avaliacoes
+        self.usuario_qtd_fotos = usuario_qtd_fotos
+        self.usuario_is_local_guide = usuario_is_local_guide
+        self.link_google = extract_id_gmaps(link_google)
+
+    def printJson(self):
+        data = {
+            "data_review_id": self.data_review_id,
+            "qtd_estrelas": self.qtd_estrelas,
+            "qtd_curtidas": self.qtd_curtidas,
+            "data": self.data,
+            "texto": self.texto,
+            "usuario_qtd_avaliacoes": self.usuario_qtd_avaliacoes,
+            "usuario_qtd_fotos": self.usuario_qtd_fotos,
+            "usuario_is_local_guide": self.usuario_is_local_guide,
+            "link_google": self.link_google
+        }
+        
+        print(json.dumps(data, ensure_ascii=False, indent=4))
+        return data
+
+class Resposta:
+    def __init__(self, data_review_id, data, texto):
+        self.data_review_id = data_review_id
+        self.data = data
+        self.texto = texto    
+
+    def printJson(self):
+        data = {
+            "data_review_id": self.data_review_id,
+            "data": self.data,
+            "texto": self.texto
+        }
+    
+        print(json.dumps(data, ensure_ascii=False, indent=4))
+        return data
+                
+class ResumoAvaliacoes:
+    def __init__(self,link_google, qnt_avaliacoes, media_estrelas, estrelas_1, estrelas_2, estrelas_3, estrelas_4, estrelas_5):
+        self.link_google = extract_id_gmaps(link_google)
+        self.qnt_avaliacoes = qnt_avaliacoes
+        self.media_estrelas = media_estrelas
+        self.estrelas_1 = estrelas_1
+        self.estrelas_2 = estrelas_2
+        self.estrelas_3 = estrelas_3        
+        self.estrelas_4 = estrelas_4
+        self.estrelas_5 = estrelas_5
+
+    def printJson(self):
+        data = {
+            "link_google": self.link_google,
+            "qtd_avaliacoes": self.qnt_avaliacoes,
+            "media_estrelas": self.media_estrelas,
+            "estrelas_1": self.estrelas_1,
+            "estrelas_2": self.estrelas_2,
+            "estrelas_3": self.estrelas_3,        
+            "estrelas_4": self.estrelas_4, 
+            "estrelas_5": self.estrelas_5
+        }
+
+        print(json.dumps(data, ensure_ascii=False, indent=4))
+        return data
+
+class EstabelecimentoTags:
+    def __init__ (self, link_google, tag):
+        self.link_google = extract_id_gmaps(link_google)
+        self.tag = tag
+
+    def printJson(self):
+        data = {
+            "link_google": self.link_google,
+            "tag": self.tag  # tags é um vetor de strings
+        }
+        print(json.dumps(data, ensure_ascii=False, indent=4))
+        return data
+
+def main() -> None:
     def openTab(driver: webdriver.Chrome, tab_name: str) -> None:
         print(f"Abrindo aba: {tab_name}...")
         tab = driver.find_element(By.XPATH, f'//button[.//div[contains(@class, "NlVald") and normalize-space()="{tab_name}"]]')
@@ -134,9 +252,107 @@ def main() -> None:
                     break
         ActionChains(driver).send_keys(Keys.HOME).perform()
         print("Todas as entidades foram carregados.")
-            
+    
+    def formatDate(dataString) -> str:
+        numero, palavra = dataString.split()[:2]
+        if numero == "um" or numero == "uma":
+            numero = 1
+        else:
+            numero = int(numero)
+
+        dataAtual = datetime.now()
+
+        if numero == 1:
+            if(palavra == "ano"):
+                dataCalculada = dataAtual - relativedelta(years=1)
+            elif(palavra == "mês"):
+                dataCalculada = dataAtual - relativedelta(months=1)
+            elif(palavra == "semana"):
+                dataCalculada = dataAtual - relativedelta(weeks=1)
+            elif(palavra == "dia"):
+                dataCalculada = dataAtual - relativedelta(days=1)
+            else:   
+                dataCalculada = dataAtual
+        elif palavra == "anos":
+            dataCalculada = dataAtual - relativedelta(years=numero)
+        elif palavra == "meses" :
+            dataCalculada = dataAtual - relativedelta(months=numero)
+        elif palavra == "semanas":
+            dataCalculada = dataAtual - relativedelta(weeks=numero)
+        elif palavra == "dias":
+            dataCalculada = dataAtual - relativedelta(days=numero)
+        
+        else:
+            dataCalculada = dataAtual
+        
+        return dataCalculada.strftime("%Y-%m-%d")
+    
+    def formatEstabelecimento(service) -> Estabelecimento:
+        estabelecimento = Estabelecimento(
+            link_google=service["estabelecimento"].get("link")[-255:],
+            categoria=service["estabelecimento"].get("categoria"),
+            nome=service["estabelecimento"].get("nome"),
+            endereco=service["estabelecimento"].get("endereco"),
+            telefone=service["estabelecimento"].get("telefone"),
+            website=service["estabelecimento"].get("website"),
+        )
+        return estabelecimento
+    
+    def formatComentario(linkGoogle, comentario) -> Comentario:
+        return Comentario(
+            link_google= linkGoogle,
+            data_review_id= comentario["data_review_id"],
+            qtd_estrelas = int(comentario["estrelas"].split()[0]),
+            data= formatDate(comentario["data"]),
+            texto= comentario["texto"],
+            usuario_is_local_guide= comentario["local_guide"],
+            usuario_qtd_fotos= comentario["fotos"],
+            usuario_qtd_avaliacoes= comentario["avaliacoes"],
+            qtd_curtidas= comentario["curtidas"]
+        )
+
+    def formatResposta(resposta) -> Resposta:
+            return Resposta(
+                data_review_id= resposta["data_review_id"],
+                data= formatDate(resposta["data"]),
+                texto= resposta["texto"]
+            )
+
+    def formatResumoAvaliacoes(service) -> ResumoAvaliacoes:
+        linkGoogle = service["estabelecimento"].get("link")[-255:]
+
+        resumoAvaliacoes = ResumoAvaliacoes(
+            link_google = linkGoogle,
+            qnt_avaliacoes= int(service["resumo_avaliacoes"].get("avaliacoes").replace(".", "").split()[0]),
+            media_estrelas= float(service["resumo_avaliacoes"].get("media").replace(",", ".")),
+            estrelas_1= int(service["resumo_avaliacoes"].get("1_estrela").split(",")[1].split()[0]),
+            estrelas_2= int(service["resumo_avaliacoes"].get("2_estrela").split(",")[1].split()[0]),
+            estrelas_3= int(service["resumo_avaliacoes"].get("3_estrela").split(",")[1].split()[0]),       
+            estrelas_4= int(service["resumo_avaliacoes"].get("4_estrela").split(",")[1].split()[0]),
+            estrelas_5= int(service["resumo_avaliacoes"].get("5_estrela").split(",")[1].split()[0])
+        )
+        return resumoAvaliacoes
+
+    def formatEstabelecimentoTags(service) -> Estabelecimento:
+        tagsEstabelecimento = []
+        for tag in service["tags"]:
+            tagsEstabelecimento.append(tag)
+        estabelecimentoTags = EstabelecimentoTags(
+            link_google=service["estabelecimento"].get("link")[-255:],
+            tag= tagsEstabelecimento
+        )
+        return estabelecimentoTags
+    
     inicio = time.time()
     print ("Iniciando o crawler às: ", time.strftime("%H:%M:%S", time.localtime(inicio)))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tp2.settings')
+    django.setup()
+    from v1.views.estabelecimento_views import EstabelecimentoView
+    from v1.views.resumo_de_avaliacoes_views import ResumoDeAvaliacoesViewSet
+    from v1.views.estabelecimento_tag_views import EstabelecimentoTagView
+    from v1.views.comentario_views import ComentarioViewSet
+    from v1.views.resposta_views import RespostaViewSet
+    from v1.views.tag_views import TagViewSet
     
     for city in cities:
         print(f"Buscando em: {city}...")
@@ -154,7 +370,7 @@ def main() -> None:
                 url = f"https://www.google.com/maps/search/{subcategory}+in+{city}"     
                 driver.get(url)
                 driver.find_element(By.CSS_SELECTOR, ".JrN27d.SuV3fd.Zjt37e.TGiyyc").click()
-                # scroll_to_the_end(driver, ".hfpxzc")
+                scroll_to_the_end(driver, ".hfpxzc")
                 
                 num_elements = len(driver.find_elements(By.CSS_SELECTOR, ".hfpxzc"))
             
@@ -163,23 +379,23 @@ def main() -> None:
                 print("Iniciando a coleta de dados...")
                 
                 services = []
-                for i in range(num_elements):  
+                for i in range(num_elements):
                     try:
-                            element = driver.find_elements(By.CSS_SELECTOR, ".hfpxzc")[i]
-                            element.click()
+                        element = driver.find_elements(By.CSS_SELECTOR, ".hfpxzc")[i]
+                        element.click()
+                        time.sleep(5) # Espera o carregamento da página
                     except ElementClickInterceptedException:
                         continue
                         
-                    element = driver.find_elements(By.CSS_SELECTOR, ".hfpxzc")[i]
-                    element.click()
-                    time.sleep(5) # Espera o carregamento da página
-                    
+
                     print(f"Elemento {i+1} de {num_elements}")
 
                     service = {}
                     # Coletor de dados do estabelecimento
                     try:
                         service["estabelecimento"] = getEstabelecimento(driver)
+                        estabelecimento = formatEstabelecimento(service)
+                        EstabelecimentoView().create(FakeRequest(estabelecimento.printJson()))
                     except Exception as e:
                         print(f"Erro ao pegar informações do estabelecimento: {e}")
                         service["estabelecimento"] = None
@@ -187,6 +403,8 @@ def main() -> None:
                     # Coletor de dados de avaliações
                     try:
                         service["resumo_avaliacoes"] = getResumoAvaliacoes(driver)
+                        resumo_avaliacoes = formatResumoAvaliacoes(service)
+                        ResumoDeAvaliacoesViewSet().create(FakeRequest(resumo_avaliacoes.printJson()))
                     except Exception as e:
                         print(f"Erro ao pegar resumo de avaliações: {e}")
                         service["resumo_avaliacoes"] = None
@@ -196,6 +414,16 @@ def main() -> None:
                         openTab(driver, "Sobre")
                     
                         service["tags"] = getTags(driver)
+                        tags = formatEstabelecimentoTags(service)
+                        for tag in tags.tag:
+                            try:
+                                TagViewSet().create(FakeRequest({"tag": tag}))
+                            except Exception as e:
+                                print(f"Erro ao salvar tags: {e}")
+                            try:
+                                EstabelecimentoTagView().create(FakeRequest({"link_google": tags.link_google, "tag": tag}))
+                            except Exception as e:
+                                print(f"Erro ao salvar tags: {e}") 
                     except Exception as e:
                         print(f"Erro ao pegar tags: {e}")
                         service["tags"] = None
@@ -204,6 +432,14 @@ def main() -> None:
                     try:
                         openTab(driver, "Avaliações")                        
                         service["comentarios_e_respostas"] = getComentarios(driver)
+                        linkGoogle = service["estabelecimento"].get("link")[-255:]
+                        for comentario in service["comentarios_e_respostas"]["comentarios"]:
+                            comentario = formatComentario(linkGoogle, comentario)
+                            ComentarioViewSet().create(FakeRequest(comentario.printJson()))
+                        for resposta in service["comentarios_e_respostas"]["respostas"]:
+                            resposta = formatResposta(resposta)
+                            RespostaViewSet().create(FakeRequest(resposta.printJson()))
+
                     except Exception as e:
                         print(f"Erro ao pegar comentários e respostas: {e}")
                         service["comentarios_e_respostas"] = None
